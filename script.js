@@ -12,6 +12,12 @@ const manageSpinner = (status) => {
   }
 };
 
+const pronouncedWord = (word) => {
+  const Utterance = new SpeechSynthesisUtterance(word)
+  Utterance.lang = "en-EN"
+  window.speechSynthesis.speak(Utterance)
+}
+
 const loadLevel = async () => {
   try {
     const res = await fetch(
@@ -82,7 +88,7 @@ const displayLevelWord = (Words) => {
                         </div>
                         <div class="flex justify-between ">
                             <span onclick="loadWordDetails(${word.id})" class="bg-[#1A91FF10] btn hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></span>
-                            <span class="bg-[#1A91FF10] btn hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-high"></i></span>
+                            <span onclick="pronouncedWord('${word.word}')" class="bg-[#1A91FF10] btn hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-high"></i></span>
                         </div>
                     </div>
   
