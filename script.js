@@ -1,3 +1,17 @@
+const removeActive = () => {
+  const lessonBtn = document.querySelectorAll(".lesson-btn");
+  lessonBtn.forEach((btn) => btn.classList.remove("active"));
+};
+const manageSpinner = (status) => {
+  if (status == true) {
+    document.getElementById("spinner").classList.remove("hidden");
+    document.getElementById("show-words").classList.add("hidden");
+  } else {
+    document.getElementById("spinner").classList.add("hidden");
+    document.getElementById("show-words").classList.remove("hidden");
+  }
+};
+
 const loadLevel = async () => {
   try {
     const res = await fetch(
@@ -15,7 +29,7 @@ const displayLevel = (allLevel) => {
   allLevel.forEach((level) => {
     // console.log(level);
     levelContainer.innerHTML += `
-        <button onclick="loadLevelWord(${level.level_no})" class="btn btn-outline btn-primary"><i class="fa-solid fa-book-open"></i> Lesson -${level.level_no}</button>
+        <button id="lesson-btn-${level.level_no}" onclick="loadLevelWord(${level.level_no})" class="btn btn-outline btn-primary lesson-btn"><i class="fa-solid fa-book-open"></i> Lesson -${level.level_no}</button>
         
         `;
   });
@@ -23,11 +37,18 @@ const displayLevel = (allLevel) => {
 
 const loadLevelWord = async (id) => {
   // console.log(id);
+  manageSpinner(true);
   try {
     const res = await fetch(
       `https://openapi.programming-hero.com/api/level/${id}`
     );
     const data = await res.json();
+
+    removeActive();
+    const clickBtn = document.getElementById(`lesson-btn-${id}`);
+    // console.log(clickBtn);
+    clickBtn.classList.add("active");
+
     displayLevelWord(data.data);
   } catch (err) {
     console.log(err);
@@ -46,6 +67,7 @@ const displayLevelWord = (Words) => {
                     </div>
     
     `;
+    manageSpinner(false);
     return;
   }
 
@@ -54,9 +76,9 @@ const displayLevelWord = (Words) => {
     showWord.innerHTML += `
   <div class="bg-white h-fit shadow-md rounded-xl py-10 px-5">
                         <div class="space-y-4 mb-5 text-center">
-                            <h1 class="font-bold text-3xl">${word.word}</h1>
+                            <h1 class="font-bold text-3xl">${word.word ? word.word : "শব্দ পাওয়া যায়নি"}</h1>
                             <p class="font-medium text-xl">Meaning /Pronounciation</p>
-                            <div class="font-bold text-2xl text-gray-600 font-bangla">"${word.meaning} / ${word.pronunciation}"</div>
+                            <div class="font-bold text-2xl text-gray-600 font-bangla">"${word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"} / ${word.pronunciation ? word.pronunciation : "pronunciation পাওয়া যায়নি"}"</div>
                         </div>
                         <div class="flex justify-between ">
                             <span onclick="loadWordDetails(${word.id})" class="bg-[#1A91FF10] btn hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></span>
@@ -66,6 +88,7 @@ const displayLevelWord = (Words) => {
   
   `;
   });
+  manageSpinner(false);
 };
 
 const loadWordDetails = async (id) => {
@@ -81,12 +104,19 @@ const loadWordDetails = async (id) => {
   }
 };
 
+const createElementsForSynonyms = (arr) => {
+  const htmlElements = arr.map((el) => `<span class="btn">${el}</span>`);
+  return htmlElements.join(" ");
+};
+
 const displayWordDetails = (word) => {
-  // console.log(typeof word);
+  // console.log(word.synonyms);
   const detailsContainer = document.getElementById("details-container");
-  detailsContainer.innerHTML = ""
+  detailsContainer.innerHTML = "";
   detailsContainer.innerHTML += `
-  <h1 class="font-bold text-3xl">${word.word} (<i class="fa-solid fa-microphone-lines"></i>:${word.pronunciation})</h1>
+  <h1 class="font-bold text-3xl">${
+    word.word
+  } (<i class="fa-solid fa-microphone-lines"></i>:${word.pronunciation})</h1>
               <div>
                 <h1 class="font-bold">Meaning</h1>
                 <p class="font-bangla">${word.meaning}</p>
@@ -97,12 +127,29 @@ const displayWordDetails = (word) => {
               </div>
               <div>
                 <h1 class="font-bold font-bangla">সমার্থক শব্দ গুলো</h1>
-                <div></div>
+                <div>${createElementsForSynonyms(word.synonyms)}</div>
               </div>
   
   `;
-  document.getElementById("my_modal_5").showModal()
+  document.getElementById("my_modal_5").showModal();
 };
+
+document.getElementById("btn-search").addEventListener("click", () => {
+  removeActive();
+  const input = document.getElementById("input-search");
+  const searchInput = input.value.trim().toLowerCase();
+  // console.log(searchInput);
+  fetch("https://openapi.programming-hero.com/api/words/all")
+    .then((res) => res.json())
+    .then((data) => {
+      const allWords = data.data;
+      const filterWord = allWords.filter((word) =>
+        word.word.toLowerCase().includes(searchInput)
+      );
+      displayLevelWord(filterWord)
+    });
+    // input.value = ""
+});
 
 // loadLevelWord()
 loadLevel();

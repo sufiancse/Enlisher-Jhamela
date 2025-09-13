@@ -150,6 +150,23 @@
           class="flex flex-wrap justify-center gap-5"
         ></div>
 
+        <!-- search button -->
+        <section class="mt-10 flex justify-center">
+          <div class="join">
+            <div>
+              <label class="input validator join-item">
+                <input id="input-search" type="text" placeholder="Search Vocabulary Now" required />
+              </label>
+            </div>
+            <button id="btn-search" class="btn btn-primary join-item">Search</button>
+          </div>
+        </section>
+
+        <!-- spinner -->
+        <div id="spinner" class="flex justify-center items-center py-10 hidden">
+          <span class="loading loading-spinner loading-xl"></span>
+        </div>
+
         <!-- show all words -->
         <div class="mt-10">
           <div
@@ -174,13 +191,11 @@
         <!-- <button class="btn" onclick="my_modal_5.showModal()">open modal</button> -->
         <dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
           <div class="modal-box">
-            <div id="details-container" class="space-y-5">
-              
-            </div>
+            <div id="details-container" class="space-y-5"></div>
             <div class="modal-action">
               <form method="dialog">
                 <!-- if there is a button in form, it will close the modal -->
-                <button class="btn">Close</button>
+                <button class="btn btn-primary">Complete Learning</button>
               </form>
             </div>
           </div>
